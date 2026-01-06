@@ -1,0 +1,83 @@
+import React from 'react';
+
+/**
+ * BottomNavigation Component
+ * Barra de navegación inferior con iconos para diferentes secciones
+ */
+function BottomNavigation({ activeTab = 'home', onTabChange }) {
+  const [active, setActive] = React.useState(activeTab);
+
+  const handleTabClick = (tab) => {
+    setActive(tab);
+    if (onTabChange) onTabChange(tab);
+  };
+
+  const tabs = [
+    { id: 'home', icon: 'home' },
+    { id: 'tasks', icon: 'tasks' },
+    { id: 'calendar', icon: 'calendar' },
+    { id: 'analytics', icon: 'analytics' },
+    { id: 'settings', icon: 'settings' },
+  ];
+
+  const getIcon = (iconName) => {
+    switch (iconName) {
+      case 'home':
+        return (
+          <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+          </svg>
+        );
+      case 'tasks':
+        return (
+          <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+            <path fillRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clipRule="evenodd" />
+          </svg>
+        );
+      case 'calendar':
+        return (
+          <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+          </svg>
+        );
+      case 'analytics':
+        return (
+          <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
+          </svg>
+        );
+      case 'settings':
+        return (
+          <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+          </svg>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <nav className="fixed bottom-0 left-0 right-0 bg-[#2d1b3d] border-t border-gray-700 px-6 py-4 z-20">
+      <div className="max-w-md mx-auto flex items-center justify-between">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => handleTabClick(tab.id)}
+            className={`p-2 rounded-lg transition-colors ${
+              active === tab.id 
+                ? 'text-purple-400' 
+                : 'text-gray-400 hover:text-gray-300'
+            }`}
+            aria-label={tab.id}
+          >
+            {getIcon(tab.icon)}
+          </button>
+        ))}
+      </div>
+    </nav>
+  );
+}
+
+export default BottomNavigation;
