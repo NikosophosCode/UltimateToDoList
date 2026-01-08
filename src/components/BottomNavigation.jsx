@@ -58,7 +58,7 @@ function BottomNavigation({ activeTab = 'home', onTabChange }) {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-[#2d1b3d] border-t border-gray-700 px-6 py-4 z-20">
+    <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-theme px-6 py-4 z-20 shadow-lg">
       <div className="max-w-md mx-auto flex items-center justify-between">
         {tabs.map((tab) => (
           <button
@@ -66,8 +66,8 @@ function BottomNavigation({ activeTab = 'home', onTabChange }) {
             onClick={() => handleTabClick(tab.id)}
             className={`p-2 rounded-lg transition-colors ${
               active === tab.id 
-                ? 'text-purple-400' 
-                : 'text-gray-400 hover:text-gray-300'
+                ? 'text-accent' 
+                : 'text-secondary hover:text-primary'
             }`}
             aria-label={tab.id}
           >
