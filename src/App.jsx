@@ -1,5 +1,6 @@
 import React from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { ThemeProvider } from './context/ThemeContext';
 import BottomNavigation from './components/BottomNavigation';
 import HomePage from './pages/HomePage';
 import ProfilePage from './pages/ProfilePage';
@@ -37,22 +38,24 @@ function App() {
   };
 
   return (
-    <div className="max-w-md mx-auto min-h-screen pb-20 relative">
-      {/* Routes */}
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/calendar" element={<CalendarPage />} />
-        <Route path="/analytics" element={<AnalyticsPage />} />
-        <Route path="/settings" element={<SettingsPage />} />
-      </Routes>
+    <ThemeProvider>
+      <div className="max-w-md mx-auto min-h-screen pb-20 relative">
+        {/* Routes */}
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/calendar" element={<CalendarPage />} />
+          <Route path="/analytics" element={<AnalyticsPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+        </Routes>
 
-      {/* Bottom Navigation */}
-      <BottomNavigation 
-        activeTab={getActiveTab()}
-        onTabChange={handleTabChange}
-      />
-    </div>
+        {/* Bottom Navigation */}
+        <BottomNavigation 
+          activeTab={getActiveTab()}
+          onTabChange={handleTabChange}
+        />
+      </div>
+    </ThemeProvider>
   );
 }
 
