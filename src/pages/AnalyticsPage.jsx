@@ -8,8 +8,8 @@ function AnalyticsPage() {
   return (
     <div className="px-6 py-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-white mb-2">Analytics</h1>
-        <p className="text-gray-400">Your productivity insights</p>
+        <h1 className="text-2xl font-bold text-primary mb-2">Analytics</h1>
+        <p className="text-secondary">Your productivity insights</p>
       </div>
 
       {/* Stats Cards */}
@@ -33,15 +33,15 @@ function AnalyticsPage() {
       </div>
 
       {/* Weekly Progress */}
-      <div className="bg-[#2d1b3d] rounded-xl p-6 border border-gray-700 mb-6">
-        <h2 className="text-white font-semibold mb-4">Weekly Progress</h2>
+      <div className="bg-card rounded-xl p-6 border border-theme shadow-sm mb-6">
+        <h2 className="text-primary font-semibold mb-4">Weekly Progress</h2>
         <div className="space-y-3">
           {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
             <div key={day} className="flex items-center gap-3">
-              <span className="text-gray-400 w-10 text-sm">{day}</span>
-              <div className="flex-1 bg-gray-700 rounded-full h-2">
+              <span className="text-secondary w-10 text-sm">{day}</span>
+              <div className="flex-1 bg-hover rounded-full h-2">
                 <div 
-                  className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full"
+                  className="bg-accent h-2 rounded-full"
                   style={{ width: `${Math.random() * 100}%` }}
                 />
               </div>
@@ -51,8 +51,8 @@ function AnalyticsPage() {
       </div>
 
       {/* Productivity Score */}
-      <div className="bg-[#2d1b3d] rounded-xl p-6 border border-gray-700">
-        <h2 className="text-white font-semibold mb-4">Productivity Score</h2>
+      <div className="bg-card rounded-xl p-6 border border-theme shadow-sm">
+        <h2 className="text-primary font-semibold mb-4">Productivity Score</h2>
         <div className="flex items-center justify-center">
           <div className="relative w-32 h-32">
             <svg className="transform -rotate-90 w-32 h-32">
@@ -63,7 +63,7 @@ function AnalyticsPage() {
                 stroke="currentColor"
                 strokeWidth="8"
                 fill="transparent"
-                className="text-gray-700"
+                className="text-hover"
               />
               <circle
                 cx="64"
@@ -78,14 +78,14 @@ function AnalyticsPage() {
               />
               <defs>
                 <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#8b5cf6" />
-                  <stop offset="100%" stopColor="#ec4899" />
+                  <stop offset="0%" stopColor="var(--accent-from)" />
+                  <stop offset="100%" stopColor="var(--accent-to)" />
                 </linearGradient>
               </defs>
             </svg>
             <div className="absolute inset-0 flex items-center justify-center flex-col">
-              <span className="text-3xl font-bold text-white">75</span>
-              <span className="text-sm text-gray-400">Score</span>
+              <span className="text-3xl font-bold text-primary">75</span>
+              <span className="text-sm text-secondary">Score</span>
             </div>
           </div>
         </div>
