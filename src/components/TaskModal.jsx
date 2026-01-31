@@ -3,6 +3,7 @@ import React from 'react';
 /**
  * TaskModal Component
  * Modal para crear o editar una tarea
+ * Soporta temas claro/oscuro y colores de acento dinámicos
  */
 function TaskModal({ isOpen, onClose, onSave, initialTask = null }) {
   const [title, setTitle] = React.useState(initialTask?.text || '');
@@ -44,15 +45,15 @@ function TaskModal({ isOpen, onClose, onSave, initialTask = null }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-[#2d1b3d] rounded-2xl p-6 w-full max-w-md">
+    <div className="fixed inset-0 modal-backdrop flex items-center justify-center z-50 p-4">
+      <div className="modal-content rounded-2xl p-6 w-full max-w-md shadow-2xl">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-white text-xl font-semibold">
+          <h3 className="text-primary text-xl font-semibold">
             {initialTask ? 'Edit Task' : 'New Task'}
           </h3>
           <button
             onClick={handleClose}
-            className="text-gray-400 hover:text-white transition-colors"
+            className="text-secondary hover:text-primary transition-colors"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -62,48 +63,48 @@ function TaskModal({ isOpen, onClose, onSave, initialTask = null }) {
 
         {/* Task Title */}
         <div className="mb-4">
-          <label className="text-gray-300 text-sm mb-2 block">Task Name</label>
+          <label className="text-secondary text-sm mb-2 block">Task Name</label>
           <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Enter task name..."
-            className="w-full bg-[#3d2852] text-white placeholder-gray-500 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-purple-500 border border-gray-600"
+            className="w-full bg-hover text-primary placeholder-tertiary rounded-lg py-3 px-4 border border-theme input-accent transition-all duration-300"
           />
         </div>
 
         {/* Time Range */}
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
-            <label className="text-gray-300 text-sm mb-2 block">Start Time</label>
+            <label className="text-secondary text-sm mb-2 block">Start Time</label>
             <input
               type="time"
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
-              className="w-full bg-[#3d2852] text-white rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-purple-500 border border-gray-600"
+              className="w-full bg-hover text-primary rounded-lg py-3 px-4 border border-theme input-accent transition-all duration-300"
             />
           </div>
           <div>
-            <label className="text-gray-300 text-sm mb-2 block">End Time</label>
+            <label className="text-secondary text-sm mb-2 block">End Time</label>
             <input
               type="time"
               value={endTime}
               onChange={(e) => setEndTime(e.target.value)}
-              className="w-full bg-[#3d2852] text-white rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-purple-500 border border-gray-600"
+              className="w-full bg-hover text-primary rounded-lg py-3 px-4 border border-theme input-accent transition-all duration-300"
             />
           </div>
         </div>
 
         {/* Color Picker */}
         <div className="mb-6">
-          <label className="text-gray-300 text-sm mb-2 block">Accent Color</label>
+          <label className="text-secondary text-sm mb-2 block">Task Color</label>
           <div className="flex gap-3">
             {colors.map((c) => (
               <button
                 key={c.value}
                 onClick={() => setColor(c.value)}
                 className={`w-10 h-10 rounded-full transition-all ${
-                  color === c.value ? 'ring-2 ring-white ring-offset-2 ring-offset-[#2d1b3d] scale-110' : 'hover:scale-105'
+                  color === c.value ? 'ring-2 ring-accent-dynamic ring-offset-2 ring-offset-card scale-110' : 'hover:scale-105'
                 }`}
                 style={{ backgroundColor: c.value }}
                 aria-label={c.name}
@@ -116,15 +117,15 @@ function TaskModal({ isOpen, onClose, onSave, initialTask = null }) {
         <div className="flex gap-3">
           <button
             onClick={handleClose}
-            className="flex-1 bg-[#3d2852] text-white py-3 rounded-lg hover:bg-[#4a2f5e] transition-colors font-medium"
+            className="flex-1 btn-secondary py-3 rounded-lg font-medium"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
-            className="flex-1 bg-purple-500 text-white py-3 rounded-lg hover:bg-purple-600 transition-colors font-medium"
+            className="flex-1 btn-accent py-3 rounded-lg font-medium"
           >
-            {initialTask ? 'Update' : 'Create'}
+            <span>{initialTask ? 'Update' : 'Create'}</span>
           </button>
         </div>
       </div>
