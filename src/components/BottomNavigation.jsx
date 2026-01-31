@@ -3,6 +3,7 @@ import React from 'react';
 /**
  * BottomNavigation Component
  * Barra de navegación inferior con iconos para diferentes secciones
+ * Soporta colores de acento dinámicos y temas claro/oscuro via CSS variables
  */
 function BottomNavigation({ activeTab = 'home', onTabChange }) {
   const [active, setActive] = React.useState(activeTab);
@@ -13,11 +14,11 @@ function BottomNavigation({ activeTab = 'home', onTabChange }) {
   };
 
   const tabs = [
-    { id: 'home', icon: 'home' },
-    { id: 'profile', icon: 'profile' },
-    { id: 'calendar', icon: 'calendar' },
-    { id: 'analytics', icon: 'analytics' },
-    { id: 'settings', icon: 'settings' },
+    { id: 'home', icon: 'home', label: 'Inicio' },
+    { id: 'profile', icon: 'profile', label: 'Perfil' },
+    { id: 'calendar', icon: 'calendar', label: 'Calendario' },
+    { id: 'analytics', icon: 'analytics', label: 'Estadísticas' },
+    { id: 'settings', icon: 'settings', label: 'Ajustes' },
   ];
 
   const getIcon = (iconName) => {
@@ -58,22 +59,28 @@ function BottomNavigation({ activeTab = 'home', onTabChange }) {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-theme px-6 py-4 z-20 shadow-lg">
-      <div className="max-w-md mx-auto flex items-center justify-between">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => handleTabClick(tab.id)}
-            className={`p-2 rounded-lg transition-colors ${
-              active === tab.id 
-                ? 'text-accent' 
-                : 'text-secondary hover:text-primary'
-            }`}
-            aria-label={tab.id}
-          >
-            {getIcon(tab.icon)}
-          </button>
-        ))}
+    <nav className="fixed bottom-0 left-0 right-0 bottom-nav px-4 py-3 z-20">
+      <div className="max-w-md mx-auto flex items-center justify-around">
+        {tabs.map((tab) => {
+          const isActive = active === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => handleTabClick(tab.id)}
+              className={`nav-item ${isActive ? 'nav-item-active' : 'nav-item-inactive'}`}
+              aria-label={tab.label}
+              aria-current={isActive ? 'page' : undefined}
+            >
+              {getIcon(tab.icon)}
+              {isActive && (
+                <>
+                  <span className="nav-label">{tab.label}</span>
+                  <span className="nav-indicator" />
+                </>
+              )}
+            </button>
+          );
+        })}
       </div>
     </nav>
   );
