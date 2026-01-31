@@ -1,8 +1,17 @@
-function CreateTaskButton() {
+/**
+ * CreateTaskButton Component
+ * Botón para crear nuevas tareas
+ * Soporta colores de acento dinámicos
+ */
+function CreateTaskButton({ onClick, children = "Create Task" }) {
   return (
-    <button className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors font-semibold shadow-md">
-      Create Task
+    <button 
+      onClick={onClick}
+      className="btn-accent px-6 py-3 rounded-lg font-semibold"
+    >
+      <span>{children}</span>
     </button>
-  )
+  );
 }
+
 export default CreateTaskButton;
