@@ -1,18 +1,37 @@
 import React from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import { ThemeProvider } from './context/ThemeContext';
+import { AuthProvider } from './context/AuthContext';
+
+// Components
 import BottomNavigation from './components/BottomNavigation';
+import ProtectedRoute from './components/common/ProtectedRoute';
+import PublicRoute from './components/common/PublicRoute';
+
+// Pages - Main App
 import HomePage from './pages/HomePage';
 import ProfilePage from './pages/ProfilePage';
 import CalendarPage from './pages/CalendarPage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import SettingsPage from './pages/SettingsPage';
 
+// Pages - Auth
+import {
+  LoginPage,
+  RegisterPage,
+  ForgotPasswordPage,
+  ResetPasswordPage,
+} from './pages/auth';
+
+// Routes config
+import { ROUTES } from './config/constants';
+
 /**
- * App Component
- * Componente principal que gestiona el routing de la aplicación
+ * MainLayout Component
+ * Layout principal de la aplicación con navegación inferior
  */
-function App() {
+function MainLayout({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -38,23 +57,125 @@ function App() {
   };
 
   return (
-    <ThemeProvider>
-      <div className="max-w-md mx-auto min-h-screen pb-20 relative">
-        {/* Routes */}
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/calendar" element={<CalendarPage />} />
-          <Route path="/analytics" element={<AnalyticsPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
-        </Routes>
+    <div className="max-w-md mx-auto min-h-screen pb-20 relative">
+      {children}
+      <BottomNavigation 
+        activeTab={getActiveTab()}
+        onTabChange={handleTabChange}
+      />
+    </div>
+  );
+}
 
-        {/* Bottom Navigation */}
-        <BottomNavigation 
-          activeTab={getActiveTab()}
-          onTabChange={handleTabChange}
+/**
+ * App Component
+ * Componente principal que gestiona el routing de la aplicación
+ */
+function App() {
+  return (
+    <ThemeProvider>
+      <AuthProvider>
+        {/* Toast notifications */}
+        <Toaster 
+          position="top-center"
+          richColors
+          closeButton
+          toastOptions={{
+            duration: 4000,
+          }}
         />
-      </div>
+
+        <Routes>
+          {/* Rutas públicas (solo para usuarios no autenticados) */}
+          <Route
+            path={ROUTES.LOGIN}
+            element={
+              <PublicRoute>
+                <LoginPage />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path={ROUTES.REGISTER}
+            element={
+              <PublicRoute>
+                <RegisterPage />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path={ROUTES.FORGOT_PASSWORD}
+            element={
+              <PublicRoute>
+                <ForgotPasswordPage />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path={ROUTES.RESET_PASSWORD}
+            element={
+              <PublicRoute>
+                <ResetPasswordPage />
+              </PublicRoute>
+            }
+          />
+
+          {/* Rutas protegidas (requieren autenticación) */}
+          <Route
+            path={ROUTES.HOME}
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <HomePage />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTES.PROFILE}
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <ProfilePage />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTES.CALENDAR}
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <CalendarPage />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTES.ANALYTICS}
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <AnalyticsPage />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTES.SETTINGS}
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <SettingsPage />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Ruta por defecto - redirigir al home */}
+          <Route path="*" element={<PublicRoute><LoginPage /></PublicRoute>} />
+        </Routes>
+      </AuthProvider>
     </ThemeProvider>
   );
 }
