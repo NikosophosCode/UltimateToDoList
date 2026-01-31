@@ -58,7 +58,11 @@ body {
   background-color: var(--bg-card);
 }
 
-.bg-hover:hover {
+.bg-hover {
+  background-color: var(--bg-hover);
+}
+
+.bg-hover-interactive:hover {
   background-color: var(--bg-hover);
 }
 
@@ -70,8 +74,60 @@ body {
   color: var(--text-secondary);
 }
 
+.text-tertiary {
+  color: var(--text-tertiary);
+}
+
+.placeholder-tertiary::placeholder {
+  color: var(--text-tertiary);
+}
+
 .border-theme {
   border-color: var(--border-color);
+}
+
+/* Modal Styles */
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+}
+
+[data-theme="dark"] .modal-content {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5),
+              0 0 30px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="light"] .modal-content {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15),
+              0 0 30px rgba(0, 0, 0, 0.08);
+}
+
+/* Ring offset for color picker */
+.ring-offset-card {
+  --tw-ring-offset-color: var(--bg-card);
+}
+
+.ring-accent-dynamic {
+  --tw-ring-color: var(--accent-from);
+}
+
+/* Secondary button */
+.btn-secondary {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-secondary:hover {
+  background-color: var(--bg-tertiary);
+  border-color: var(--text-tertiary);
 }
 
 .bg-accent {
@@ -83,4 +139,226 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* Bottom Navigation Styles */
+.bottom-nav {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border-color);
+}
+
+[data-theme="dark"] .bottom-nav {
+  background: rgba(45, 27, 61, 0.85);
+  box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="light"] .bottom-nav {
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* Nav item base styles */
+.nav-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 16px;
+  border-radius: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-item svg {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Inactive state */
+.nav-item-inactive {
+  color: var(--text-tertiary);
+}
+
+.nav-item-inactive:hover {
+  color: var(--text-secondary);
+  background: var(--bg-hover);
+}
+
+[data-theme="dark"] .nav-item-inactive:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="light"] .nav-item-inactive:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+/* Active state with accent color */
+.nav-item-active {
+  color: var(--accent-from);
+}
+
+.nav-item-active svg {
+  filter: drop-shadow(0 0 8px var(--accent-from));
+}
+
+/* Active background glow */
+.nav-item-active::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--accent-from), var(--accent-to));
+  opacity: 0.15;
+  border-radius: 16px;
+  transition: opacity 0.3s ease;
+}
+
+[data-theme="light"] .nav-item-active::before {
+  opacity: 0.12;
+}
+
+/* Active indicator dot */
+.nav-indicator {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-from), var(--accent-to));
+  box-shadow: 0 0 8px var(--accent-from);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Active label */
+.nav-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: capitalize;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-item-active .nav-label {
+  opacity: 1;
+  transform: translateY(0);
+  background: linear-gradient(to right, var(--accent-from), var(--accent-to));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ========================================
+   Accent Button Styles
+   ======================================== */
+
+/* Primary accent button (Add, Search, Create) */
+.btn-accent {
+  position: relative;
+  background: linear-gradient(135deg, var(--accent-from), var(--accent-to));
+  color: white;
+  border: none;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-accent::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--accent-to), var(--accent-from));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.btn-accent:hover::before {
+  opacity: 1;
+}
+
+.btn-accent:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25),
+              0 0 20px color-mix(in srgb, var(--accent-from) 40%, transparent);
+}
+
+.btn-accent:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.btn-accent > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Floating Action Button (FAB) */
+.btn-fab {
+  position: fixed;
+  bottom: 6rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  background: linear-gradient(135deg, var(--accent-from), var(--accent-to));
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3),
+              0 0 30px color-mix(in srgb, var(--accent-from) 30%, transparent);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-fab::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-to), var(--accent-from));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.btn-fab:hover {
+  transform: translateX(-50%) scale(1.1);
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.35),
+              0 0 40px color-mix(in srgb, var(--accent-from) 50%, transparent);
+}
+
+.btn-fab:hover::before {
+  opacity: 1;
+}
+
+.btn-fab:active {
+  transform: translateX(-50%) scale(1.05);
+}
+
+.btn-fab > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Search input accent ring */
+.input-accent:focus {
+  outline: none;
+  border-color: var(--accent-from);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-from) 25%, transparent);
+}
+
+/* Search button small */
+.btn-search {
+  background: linear-gradient(135deg, var(--accent-from), var(--accent-to));
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--accent-from) 30%, transparent);
+}
+
+.btn-search:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px color-mix(in srgb, var(--accent-from) 40%, transparent);
+}
+
+.btn-search:active {
+  transform: scale(0.98);
 }
