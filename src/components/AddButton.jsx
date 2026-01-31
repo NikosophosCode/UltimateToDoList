@@ -1,12 +1,13 @@
 /**
  * AddButton Component
  * Botón flotante circular para agregar nuevas tareas
+ * Soporta colores de acento dinámicos
  */
 function AddButton({ onClick }) {
   return (
     <button
       onClick={onClick}
-      className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-red-500 hover:bg-red-600 w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110 z-10"
+      className="btn-fab"
       aria-label="Add new task"
     >
       <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
