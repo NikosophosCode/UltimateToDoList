@@ -39,7 +39,7 @@ function ProfileInfo() {
   const onSubmit = async (data) => {
     try {
       const updated = await userApi.updateProfile({ name: data.name });
-      updateUser({ name: updated.name || data.name });
+      updateUser({ name: updated?.name || data.name });
       toast.success('Perfil actualizado correctamente');
       setIsEditing(false);
     } catch (err) {
@@ -150,12 +150,12 @@ function ProfileInfo() {
             <span className="text-secondary text-sm">Miembro desde</span>
             <span className="text-primary font-medium">{memberSince}</span>
           </div>
-          {user?.email_verified !== undefined && (
+          {user?.isEmailVerified !== undefined && (
             <>
               <div className="border-t border-theme" />
               <div className="flex items-center justify-between py-2">
                 <span className="text-secondary text-sm">Email verificado</span>
-                {(user.email_verified || user.emailVerified) ? (
+                {user.isEmailVerified ? (
                   <span className="flex items-center gap-1 text-green-500 text-sm font-medium">
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
