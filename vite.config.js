@@ -2,6 +2,9 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -12,8 +15,19 @@ export default defineConfig({
     },
   },
   server: {
-    host: true, // Expone el servidor en la red local (equivalente a '0.0.0.0')
-    port: 5173, // Puerto por defecto
-    open: true, // Abre el navegador automáticamente
+    host: true,
+    port: 5173,
+  },
+  build: {
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          auth: ['@react-oauth/google', 'jwt-decode'],
+          ui: ['sonner', 'clsx', 'tailwind-merge'],
+        },
+      },
+    },
   },
 })
