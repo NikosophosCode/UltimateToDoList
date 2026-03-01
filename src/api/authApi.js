@@ -88,7 +88,7 @@ export const authApi = {
    */
   async facebookLogin(accessToken, userId) {
     const response = await api.post('/auth/facebook', {
-      token: accessToken,
+      accessToken,
       userId,
     });
     return response.data;
