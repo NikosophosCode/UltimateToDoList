@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Header from '../components/Header';
 import SearchBar from '../components/SearchBar';
 import SectionHeader from '../components/SectionHeader';
@@ -8,127 +8,137 @@ import AddButton from '../components/AddButton';
 import TaskModal from '../components/TaskModal';
 import EmptyState from '../components/EmptyState';
 import ConfirmDialog from '../components/ConfirmDialog';
-import useLocalStorage from '../hooks/useLocalStorage';
+import { LoadingSpinner } from '../components/common';
+import { useTasks } from '../hooks/useTasks';
 
 /**
  * HomePage Component
  * Página principal con la lista de tareas del día
+ * Conectada al backend API para persistencia
  */
 function HomePage() {
-  // Tareas por defecto si no hay nada en localStorage
-  const defaultTodos = [
-    { id: Date.now() + 1, text: 'Workout for 40min', timeRange: '8:00AM - 8:30AM', completed: false, color: '#8b5cf6' },
-    { id: Date.now() + 2, text: 'Design the home screen of the music app', timeRange: '11:00AM - 12:00PM', completed: false, color: '#ec4899' },
-    { id: Date.now() + 3, text: 'Learn React.js', timeRange: '1:00PM - 2:00PM', completed: true, color: '#06b6d4' },
-  ];
+  const { tasks, isLoading, stats, createTask, updateTask, deleteTask, toggleTask, migrateFromLocalStorage } = useTasks({ todayOnly: true });
+  
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, task: null });
+  const [hasMigrated, setHasMigrated] = useState(false);
 
-  // Usar el hook personalizado para persistencia en localStorage
-  const [todos, setTodos] = useLocalStorage('todos', defaultTodos);
-  const [searchTerm, setSearchTerm] = React.useState('');
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const [editingTask, setEditingTask] = React.useState(null);
-  const [deleteConfirm, setDeleteConfirm] = React.useState({ isOpen: false, taskIndex: null });
+  // Migrar tareas de localStorage al backend (una sola vez)
+  useEffect(() => {
+    if (hasMigrated) return;
+    const localTasks = localStorage.getItem('todos');
+    if (localTasks) {
+      try {
+        const parsed = JSON.parse(localTasks);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          migrateFromLocalStorage();
+          setHasMigrated(true);
+        }
+      } catch {
+        // Ignorar errores de parsing
+      }
+    }
+  }, [hasMigrated, migrateFromLocalStorage]);
 
-  const completedTodos = todos.filter(todo => !!todo.completed).length;
-  const totalTodos = todos.length;
-  const progressPercentage = totalTodos > 0 ? Math.round((completedTodos / totalTodos) * 100) : 0;
-
-  const filteredTodos = todos.filter(todo => 
-    todo.text.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredTasks = tasks.filter(task => 
+    (task.title || task.text || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleToggleTodo = (index, completed) => {
-    const newTodos = [...todos];
-    newTodos[index].completed = completed;
-    setTodos(newTodos);
-  };
+  const handleToggleTodo = useCallback((taskId, completed) => {
+    toggleTask(taskId, completed);
+  }, [toggleTask]);
 
   const handleAddTask = () => {
     setEditingTask(null);
     setIsModalOpen(true);
   };
 
-  const handleSaveTask = (task) => {
-    if (editingTask !== null) {
-      // Editar tarea existente
-      const newTodos = [...todos];
-      newTodos[editingTask] = { ...newTodos[editingTask], ...task };
-      setTodos(newTodos);
+  const handleSaveTask = async (taskData) => {
+    if (editingTask) {
+      await updateTask(editingTask.id, taskData);
     } else {
-      // Agregar nueva tarea con ID único
-      const newTask = {
-        ...task,
-        id: Date.now(), // ID único basado en timestamp
-      };
-      setTodos([...todos, newTask]);
+      // Si no tiene fecha, asignar hoy para que aparezca en la vista
+      if (!taskData.dueDate) {
+        taskData.dueDate = new Date().toISOString().split('T')[0];
+      }
+      await createTask(taskData);
     }
     setIsModalOpen(false);
     setEditingTask(null);
   };
 
-  const handleEditTask = (index) => {
-    setEditingTask(index);
+  const handleEditTask = (task) => {
+    setEditingTask(task);
     setIsModalOpen(true);
   };
 
-  const handleDeleteTask = (index) => {
-    setDeleteConfirm({ isOpen: true, taskIndex: index });
+  const handleDeleteTask = (task) => {
+    setDeleteConfirm({ isOpen: true, task });
   };
 
-  const confirmDelete = () => {
-    if (deleteConfirm.taskIndex !== null) {
-      const newTodos = todos.filter((_, i) => i !== deleteConfirm.taskIndex);
-      setTodos(newTodos);
-      setDeleteConfirm({ isOpen: false, taskIndex: null });
+  const confirmDelete = async () => {
+    if (deleteConfirm.task) {
+      await deleteTask(deleteConfirm.task.id);
+      setDeleteConfirm({ isOpen: false, task: null });
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <LoadingSpinner size="lg" message="Cargando tareas..." />
+      </div>
+    );
+  }
 
   return (
     <>
       {/* Header */}
-      <Header userName="Nicolás" date="19 october 2025" time="5:00pm" />
+      <Header />
       
       {/* Search Bar */}
       <SearchBar 
         searchTerm={searchTerm} 
         setSearchTerm={setSearchTerm}
-        placeholder="Search your Lists"
+        placeholder="Buscar en tus listas"
       />
       
       {/* Section Header with Progress */}
       <SectionHeader 
-        title="Today's tasks" 
-        progress={progressPercentage}
+        title="Tareas de hoy" 
+        progress={stats.percentage}
         showProgress={true}
       />
       
       {/* Tasks List */}
       <div className="px-6 mb-6">
-        {filteredTodos.length > 0 ? (
-          filteredTodos.map((todo, index) => (
+        {filteredTasks.length > 0 ? (
+          filteredTasks.map((task) => (
             <TaskCard
-              key={todo.id || index}
-              title={todo.text}
-              timeRange={todo.timeRange}
-              completed={todo.completed}
-              accentColor={todo.color}
-              onToggle={(completed) => handleToggleTodo(index, completed)}
-              onEdit={() => handleEditTask(index)}
-              onDelete={() => handleDeleteTask(index)}
+              key={task.id}
+              title={task.title || task.text}
+              timeRange={task.timeRange}
+              completed={task.completed}
+              accentColor={task.color}
+              onToggle={(completed) => handleToggleTodo(task.id, completed)}
+              onEdit={() => handleEditTask(task)}
+              onDelete={() => handleDeleteTask(task)}
             />
           ))
         ) : (
           <EmptyState 
-            message={searchTerm ? "No tasks match your search" : "No tasks yet. Create one to get started!"}
+            message={searchTerm ? "No se encontraron tareas" : "No tienes tareas para hoy. ¡Crea una!"}
           />
         )}
       </div>
       
       {/* Tasks Completed Counter */}
-      {totalTodos > 0 && (
+      {stats.total > 0 && (
         <TasksCompleted 
-          completedTodos={completedTodos} 
-          totalTodos={totalTodos} 
+          completedTodos={stats.completed} 
+          totalTodos={stats.total} 
         />
       )}
       
@@ -143,16 +153,16 @@ function HomePage() {
           setEditingTask(null);
         }}
         onSave={handleSaveTask}
-        initialTask={editingTask !== null ? todos[editingTask] : null}
+        initialTask={editingTask}
       />
 
       {/* Confirm Delete Dialog */}
       <ConfirmDialog
         isOpen={deleteConfirm.isOpen}
-        onClose={() => setDeleteConfirm({ isOpen: false, taskIndex: null })}
+        onClose={() => setDeleteConfirm({ isOpen: false, task: null })}
         onConfirm={confirmDelete}
-        title="Delete Task"
-        message="Are you sure you want to delete this task? This action cannot be undone."
+        title="¿Eliminar tarea?"
+        message="Esta acción no se puede deshacer. La tarea será eliminada permanentemente."
       />
     </>
   );

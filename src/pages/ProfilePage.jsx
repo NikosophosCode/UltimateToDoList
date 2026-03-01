@@ -1,55 +1,112 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../hooks/useAuth';
+import { userApi } from '../api/userApi';
+import { AvatarUpload, ProfileInfo, ChangePasswordForm, LinkedAccounts, DeleteAccount } from '../components/profile';
+import { logError } from '../utils/errorHandler';
 
 /**
  * ProfilePage Component
- * Página de perfil del usuario
+ * Página de perfil del usuario con todas las funcionalidades:
+ * - Avatar upload
+ * - Información personal editable
+ * - Cambio de contraseña
+ * - Cuentas OAuth vinculadas
+ * - Estadísticas de usuario
+ * - Eliminación de cuenta
  */
 function ProfilePage() {
+  const { user } = useAuth();
+  const [stats, setStats] = useState(null);
+  const [showChangePassword, setShowChangePassword] = useState(false);
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      const data = await userApi.getStats();
+      setStats(data);
+    } catch (err) {
+      logError(err, 'ProfilePage.fetchStats');
+    }
+  };
+
   return (
     <div className="px-6 py-8">
+      {/* Avatar & User Name */}
       <div className="text-center mb-8">
-        <div className="w-24 h-24 bg-accent rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg">
-          <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-          </svg>
-        </div>
-        <h1 className="text-2xl font-bold text-primary mb-2">Nicolás</h1>
-        <p className="text-secondary">Productivity Enthusiast</p>
+        <AvatarUpload />
+        <h1 className="text-2xl font-bold text-primary mt-4 mb-1">{user?.name || 'Usuario'}</h1>
+        <p className="text-secondary">{user?.email}</p>
       </div>
 
       <div className="space-y-4">
-        <div className="bg-card rounded-xl p-4 border border-theme shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-secondary">Email</span>
-            <span className="text-primary">user@example.com</span>
-          </div>
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-secondary">Member since</span>
-            <span className="text-primary">January 2026</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-secondary">Tasks completed</span>
-            <span className="text-accent font-semibold">0</span>
-          </div>
-        </div>
-
-        <div className="bg-card rounded-xl p-4 border border-theme shadow-sm">
-          <h2 className="text-primary font-semibold mb-4">Preferences</h2>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-secondary">Theme</span>
-              <span className="text-accent">Dark</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-secondary">Notifications</span>
-              <span className="text-accent">Enabled</span>
+        {/* Stats Card */}
+        {stats && (
+          <div className="bg-card rounded-xl p-4 border border-theme shadow-sm">
+            <h2 className="text-primary font-semibold mb-4 flex items-center gap-2">
+              <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              Estadísticas
+            </h2>
+            <div className="grid grid-cols-3 gap-3">
+              <div className="text-center p-3 rounded-lg bg-hover">
+                <div className="text-2xl font-bold text-accent">{stats.totalTasks ?? stats.total_tasks ?? 0}</div>
+                <div className="text-xs text-secondary mt-1">Total</div>
+              </div>
+              <div className="text-center p-3 rounded-lg bg-hover">
+                <div className="text-2xl font-bold text-green-500">{stats.completedTasks ?? stats.completed_tasks ?? 0}</div>
+                <div className="text-xs text-secondary mt-1">Completadas</div>
+              </div>
+              <div className="text-center p-3 rounded-lg bg-hover">
+                <div className="text-2xl font-bold text-yellow-500">{stats.pendingTasks ?? stats.pending_tasks ?? 0}</div>
+                <div className="text-xs text-secondary mt-1">Pendientes</div>
+              </div>
             </div>
           </div>
+        )}
+
+        {/* Profile Info */}
+        <ProfileInfo />
+
+        {/* Change Password */}
+        <div className="bg-card rounded-xl p-4 border border-theme shadow-sm">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-primary font-semibold flex items-center gap-2">
+              <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              Contraseña
+            </h2>
+            {!showChangePassword && (
+              <button
+                onClick={() => setShowChangePassword(true)}
+                className="text-accent text-sm font-medium hover:underline"
+              >
+                Cambiar
+              </button>
+            )}
+          </div>
+          
+          {showChangePassword ? (
+            <ChangePasswordForm
+              onSuccess={() => setShowChangePassword(false)}
+              onCancel={() => setShowChangePassword(false)}
+            />
+          ) : (
+            <p className="text-secondary text-sm">
+              Tu contraseña fue establecida al crear tu cuenta. Haz clic en "Cambiar" para actualizarla.
+            </p>
+          )}
         </div>
 
-        <button className="w-full bg-accent text-white font-semibold py-3 rounded-xl hover:opacity-90 transition-all shadow-md">
-          Edit Profile
-        </button>
+        {/* Linked Accounts */}
+        <LinkedAccounts />
+
+        {/* Delete Account */}
+        <DeleteAccount />
       </div>
     </div>
   );
