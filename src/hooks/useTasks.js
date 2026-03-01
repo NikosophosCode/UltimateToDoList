@@ -13,7 +13,28 @@ import { toast } from 'sonner';
  * Normaliza una tarea del backend al formato del frontend
  * Maneja tanto snake_case como camelCase del backend
  */
+const PRIORITY_INT_TO_STR = { 0: 'low', 1: 'low', 2: 'medium', 3: 'high' };
+const PRIORITY_STR_TO_INT = { low: 1, medium: 2, high: 3 };
+
+function normalizePriority(priority) {
+  if (typeof priority === 'number') return PRIORITY_INT_TO_STR[priority] ?? 'medium';
+  if (typeof priority === 'string' && PRIORITY_STR_TO_INT[priority]) return priority;
+  return 'medium';
+}
+
 function normalizeTask(task) {
+  const timeRangeRaw = task.time_range || task.timeRange || null;
+  let startTime = task.start_time || task.startTime || null;
+  let endTime = task.end_time || task.endTime || null;
+
+  if (!startTime && !endTime && timeRangeRaw) {
+    const parts = timeRangeRaw.split(' - ');
+    if (parts.length === 2) {
+      startTime = parts[0].trim();
+      endTime = parts[1].trim();
+    }
+  }
+
   return {
     id: task.id,
     title: task.title || task.text || '',
@@ -21,11 +42,11 @@ function normalizeTask(task) {
     description: task.description || '',
     completed: task.is_completed ?? task.isCompleted ?? task.completed ?? false,
     dueDate: task.due_date || task.dueDate || null,
-    startTime: task.start_time || task.startTime || null,
-    endTime: task.end_time || task.endTime || null,
+    startTime,
+    endTime,
     timeRange: formatTimeRange(task),
     color: task.color || '#8b5cf6',
-    priority: task.priority || 'medium',
+    priority: normalizePriority(task.priority),
     position: task.position ?? 0,
     createdAt: task.created_at || task.createdAt || null,
     updatedAt: task.updated_at || task.updatedAt || null,
@@ -64,14 +85,17 @@ function formatTime(time) {
  * Prepara datos de tarea para enviar al backend
  */
 function prepareTaskForApi(taskData) {
+  const startTime = taskData.startTime || null;
+  const endTime = taskData.endTime || null;
+  const timeRange = startTime && endTime ? `${startTime} - ${endTime}` : (taskData.timeRange || null);
+
   return {
     title: taskData.text || taskData.title,
     description: taskData.description || '',
     dueDate: taskData.dueDate || null,
-    startTime: taskData.startTime || null,
-    endTime: taskData.endTime || null,
+    timeRange,
     color: taskData.color || '#8b5cf6',
-    priority: taskData.priority || 'medium',
+    priority: PRIORITY_STR_TO_INT[taskData.priority] ?? 2,
     isCompleted: taskData.completed || false,
   };
 }
