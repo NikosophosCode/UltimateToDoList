@@ -4,7 +4,7 @@ React 19 + Vite + TailwindCSS v4 frontend for the UltimateToDoList task manageme
 
 ## Tech Stack
 
-- **React 19** — UI framework
+- **React 19** — UI frameworkk
 - **Vite 7** — build tool & dev server
 - **TailwindCSS v4** — styling
 - **React Router v6** — client-side routing
