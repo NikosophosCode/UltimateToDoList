@@ -24,6 +24,14 @@ export const PASSWORD_POLICY = {
   REQUIRE_SPECIAL_CHARS: true,
 };
 
+// OAuth Configuration
+export const OAUTH_CONFIG = {
+  GOOGLE_CLIENT_ID: import.meta.env.VITE_GOOGLE_CLIENT_ID || '',
+  FACEBOOK_APP_ID: import.meta.env.VITE_FACEBOOK_APP_ID || '',
+  ENABLE_GOOGLE_AUTH: import.meta.env.VITE_ENABLE_GOOGLE_AUTH === 'true',
+  ENABLE_FACEBOOK_AUTH: import.meta.env.VITE_ENABLE_FACEBOOK_AUTH === 'true',
+};
+
 // File Upload Configuration
 export const UPLOAD_CONFIG = {
   MAX_FILE_SIZE: 5 * 1024 * 1024, // 5MB
