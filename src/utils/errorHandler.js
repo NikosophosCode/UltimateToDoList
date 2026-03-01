@@ -46,26 +46,56 @@ export const parseApiError = (error) => {
 
   const { status, data } = error.response;
 
-  // Mapear códigos de estado a mensajes
-  const statusMessages = {
-    400: data?.message || 'Solicitud inválida',
-    401: data?.message || ERROR_MESSAGES.INVALID_CREDENTIALS,
-    403: 'No tienes permiso para realizar esta acción',
-    404: 'Recurso no encontrado',
-    409: data?.message || ERROR_MESSAGES.EMAIL_EXISTS,
-    422: data?.message || 'Datos de entrada inválidos',
-    429: 'Demasiadas solicitudes. Intenta más tarde.',
-    500: 'Error del servidor. Intenta más tarde.',
-    502: 'Servidor no disponible. Intenta más tarde.',
-    503: 'Servicio no disponible. Intenta más tarde.',
+  // El backend devuelve el campo 'error', no 'message'
+  const serverMessage = data?.error || data?.message;
+  const errorCode = data?.code;
+
+  // Mapear códigos específicos del backend a mensajes claros
+  const codeMessages = {
+    INVALID_CREDENTIALS:   ERROR_MESSAGES.INVALID_CREDENTIALS,
+    EMAIL_EXISTS:          ERROR_MESSAGES.EMAIL_EXISTS,
+    TOKEN_REQUIRED:        ERROR_MESSAGES.SESSION_EXPIRED,
+    TOKEN_EXPIRED:         ERROR_MESSAGES.SESSION_EXPIRED,
+    INVALID_TOKEN:         ERROR_MESSAGES.SESSION_EXPIRED,
+    REFRESH_TOKEN_REVOKED: ERROR_MESSAGES.SESSION_EXPIRED,
+    INVALID_REFRESH_TOKEN: ERROR_MESSAGES.SESSION_EXPIRED,
+    INVALID_GOOGLE_TOKEN:  'Token de Google inválido o expirado. Intenta iniciar sesión de nuevo.',
+    OAUTH_NOT_CONFIGURED:  'La autenticación con Google no está configurada en el servidor.',
+    WEAK_PASSWORD:         ERROR_MESSAGES.WEAK_PASSWORD,
+    VALIDATION_ERROR:      serverMessage || 'Datos de entrada inválidos',
+    RATE_LIMIT:            'Demasiadas solicitudes. Intenta más tarde.',
+    USE_SOCIAL_LOGIN:      serverMessage || 'Esta cuenta usa inicio de sesión social.',
   };
 
-  const message = statusMessages[status] || ERROR_MESSAGES.GENERIC_ERROR;
+  if (errorCode && codeMessages[errorCode]) {
+    return new ApiError(
+      codeMessages[errorCode],
+      status,
+      errorCode,
+      data?.details || null
+    );
+  }
+
+  // Fallback: usar el mensaje del servidor o mapeo por código HTTP
+  const statusMessages = {
+    400: serverMessage || 'Solicitud inválida',
+    401: serverMessage || ERROR_MESSAGES.INVALID_CREDENTIALS,
+    403: serverMessage || 'No tienes permiso para realizar esta acción',
+    404: serverMessage || 'Recurso no encontrado',
+    409: serverMessage || ERROR_MESSAGES.EMAIL_EXISTS,
+    422: serverMessage || 'Datos de entrada inválidos',
+    429: serverMessage || 'Demasiadas solicitudes. Intenta más tarde.',
+    500: 'Error del servidor. Intenta más tarde.',
+    502: 'Servidor no disponible. Intenta más tarde.',
+    503: serverMessage || 'Servicio no disponible. Intenta más tarde.',
+  };
+
+  const message = statusMessages[status] || serverMessage || ERROR_MESSAGES.GENERIC_ERROR;
 
   return new ApiError(
     message,
     status,
-    data?.code || `HTTP_${status}`,
+    errorCode || `HTTP_${status}`,
     data?.details || null
   );
 };
