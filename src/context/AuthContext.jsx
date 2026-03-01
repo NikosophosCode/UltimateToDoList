@@ -36,54 +36,68 @@ export function AuthProvider({ children }) {
    * Inicializar autenticación al cargar la app
    */
   useEffect(() => {
+    const controller = new AbortController();
+
     const initAuth = async () => {
       try {
         const hasTokens = tokenStorage.hasTokens();
-        
+
         if (!hasTokens) {
           setIsLoading(false);
           return;
         }
 
         const accessToken = tokenStorage.getAccessToken();
-        
-        // Si el access token está expirado, intentar refresh
-        if (accessToken && tokenStorage.isTokenExpired(accessToken)) {
+
+        // Si no hay access token O está expirado, intentar refresh
+        if (!accessToken || tokenStorage.isTokenExpired(accessToken)) {
           const refreshToken = tokenStorage.getRefreshToken();
-          
+
           if (refreshToken && !tokenStorage.isTokenExpired(refreshToken)) {
             try {
               const tokens = await authApi.refreshToken(refreshToken);
-              tokenStorage.setTokens(tokens.accessToken, tokens.refreshToken || refreshToken);
+              tokenStorage.setTokens(
+                tokens.accessToken,
+                tokens.refreshToken || refreshToken,
+              );
             } catch {
-              // Si falla el refresh, limpiar tokens
               tokenStorage.clearTokens();
-              setIsLoading(false);
+              if (!controller.signal.aborted) setIsLoading(false);
               return;
             }
           } else {
             tokenStorage.clearTokens();
-            setIsLoading(false);
+            if (!controller.signal.aborted) setIsLoading(false);
             return;
           }
         }
 
         // Obtener datos del usuario actual
         const userData = await authApi.getCurrentUser();
-        setUser(userData);
-        setIsAuthenticated(true);
-        
+
+        if (!controller.signal.aborted) {
+          setUser(userData);
+          setIsAuthenticated(true);
+        }
       } catch (error) {
-        logError(error, 'AuthContext.initAuth');
-        tokenStorage.clearTokens();
-        setUser(null);
-        setIsAuthenticated(false);
+        if (!controller.signal.aborted) {
+          logError(error, 'AuthContext.initAuth');
+          tokenStorage.clearTokens();
+          setUser(null);
+          setIsAuthenticated(false);
+        }
       } finally {
-        setIsLoading(false);
+        if (!controller.signal.aborted) {
+          setIsLoading(false);
+        }
       }
     };
 
     initAuth();
+
+    return () => {
+      controller.abort();
+    };
   }, []);
 
   /**
