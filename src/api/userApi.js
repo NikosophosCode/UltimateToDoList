@@ -15,7 +15,7 @@ export const userApi = {
    */
   async getProfile() {
     const response = await api.get('/user/profile');
-    return response.data;
+    return response.data.user;
   },
 
   /**
@@ -25,7 +25,7 @@ export const userApi = {
    */
   async updateProfile(data) {
     const response = await api.put('/user/profile', data);
-    return response.data;
+    return response.data.user;
   },
 
   /**
@@ -77,7 +77,7 @@ export const userApi = {
    */
   async getLinkedAccounts() {
     const response = await api.get('/user/linked-accounts');
-    return response.data;
+    return response.data.linkedAccounts;
   },
 
   /**
@@ -126,7 +126,7 @@ export const userApi = {
    */
   async getStats() {
     const response = await api.get('/user/stats');
-    return response.data;
+    return response.data.stats;
   },
 
   /**

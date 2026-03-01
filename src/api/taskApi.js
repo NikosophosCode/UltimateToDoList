@@ -5,6 +5,15 @@
 
 import { api } from './axios';
 
+function getLocalDateStr(date = new Date()) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+export { getLocalDateStr };
+
 /**
  * Servicio de tareas
  */
@@ -66,7 +75,7 @@ export const taskApi = {
    * @returns {Promise<Task>}
    */
   async toggleTask(id, completed) {
-    const response = await api.patch(`/tasks/${id}/toggle`, { completed });
+    const response = await api.patch(`/tasks/${id}/complete`, { completed });
     return response.data;
   },
 
@@ -76,7 +85,7 @@ export const taskApi = {
    * @returns {Promise<Task[]>}
    */
   async getTasksByDate(date) {
-    const response = await api.get('/tasks/by-date', { params: { date } });
+    const response = await api.get(`/tasks/date/${date}`);
     return response.data;
   },
 
@@ -85,7 +94,8 @@ export const taskApi = {
    * @returns {Promise<Task[]>}
    */
   async getTodayTasks() {
-    const response = await api.get('/tasks/today');
+    const today = getLocalDateStr();
+    const response = await api.get(`/tasks/date/${today}`);
     return response.data;
   },
 
@@ -104,7 +114,7 @@ export const taskApi = {
    * @returns {Promise<{ imported: number, skipped: number }>}
    */
   async migrateFromLocalStorage(tasks) {
-    const response = await api.post('/tasks/migrate', { tasks });
+    const response = await api.post('/tasks/import', { tasks });
     return response.data;
   },
 };
