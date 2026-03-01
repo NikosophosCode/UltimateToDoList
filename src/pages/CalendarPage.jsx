@@ -1,5 +1,5 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import { taskApi } from '../api/taskApi';
+import React, { useState, useCallback, useMemo, useRef } from 'react';
+import { taskApi, getLocalDateStr } from '../api/taskApi';
 import TaskCard from '../components/TaskCard';
 import EmptyState from '../components/EmptyState';
 import { LoadingSpinner } from '../components/common';
@@ -17,6 +17,7 @@ function CalendarPage() {
   const [tasks, setTasks] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [loadedDate, setLoadedDate] = useState(null);
+  const initFetchDone = useRef(false);
 
   // Calcular información del mes actual
   const calendarData = useMemo(() => {
@@ -66,7 +67,7 @@ function CalendarPage() {
   };
 
   const formatDateForApi = (date) => {
-    return date.toISOString().split('T')[0];
+    return getLocalDateStr(date);
   };
 
   // Cargar tareas para la fecha seleccionada
@@ -140,8 +141,10 @@ function CalendarPage() {
     fetchTasksForDate(new Date());
   };
 
-  // Cargar tareas de hoy al montar
+  // Cargar tareas de hoy al montar (useRef previene doble-fetch en React StrictMode)
   React.useEffect(() => {
+    if (initFetchDone.current) return;
+    initFetchDone.current = true;
     fetchTasksForDate(selectedDate);
   }, []);
 

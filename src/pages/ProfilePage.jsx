@@ -26,7 +26,10 @@ function ProfilePage() {
   const fetchStats = async () => {
     try {
       const data = await userApi.getStats();
-      setStats(data);
+      setStats({
+        ...data,
+        pendingTasks: (data?.totalTasks ?? 0) - (data?.completedTasks ?? 0),
+      });
     } catch (err) {
       logError(err, 'ProfilePage.fetchStats');
     }

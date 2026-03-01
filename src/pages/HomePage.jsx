@@ -10,6 +10,7 @@ import EmptyState from '../components/EmptyState';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { LoadingSpinner } from '../components/common';
 import { useTasks } from '../hooks/useTasks';
+import { getLocalDateStr } from '../api/taskApi';
 
 /**
  * HomePage Component
@@ -61,7 +62,7 @@ function HomePage() {
     } else {
       // Si no tiene fecha, asignar hoy para que aparezca en la vista
       if (!taskData.dueDate) {
-        taskData.dueDate = new Date().toISOString().split('T')[0];
+        taskData.dueDate = getLocalDateStr();
       }
       await createTask(taskData);
     }
